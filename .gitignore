@@ -1,0 +1,32 @@
+# Odoo core (don't version control the entire Odoo framework)
+odoo/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Odoo
+*.pyc
+*.pyo
+*.swp
+*.log
+filestore/
+sessions/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configuration (adjust as needed)
+# odoo.conf
