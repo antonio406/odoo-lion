@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-inherit="web.NavBar.AppsMenu" t-inherit-mode="extension">
+        <xpath expr="//DropdownItem" position="replace">
+             <div class="o_app_grid_container">
+                <t t-foreach="apps" t-as="app" t-key="app.id">
+                    <DropdownItem
+                        class="{ 'o_app_icon': true, focus: menuService.getCurrentApp() === app }"
+                        onSelected="() => this.onNavBarDropdownItemSelection(app)"
+                        attrs="{ href: getMenuItemHref(app), 'data-menu-xmlid': app.xmlid, 'data-section': app.id }"
+                    >
+                        <div class="o_app_icon_content">
+                            <t t-if="app.webIconData">
+                                <img t-attf-src="{{app.webIconData}}" class="o_app_icon_img"/>
+                            </t>
+                            <t t-elif="app.webIcon">
+                                <div class="o_app_icon_colored" t-attf-style="background-color: {{app.webIcon.backgroundColor}}; color: {{app.webIcon.color}};">
+                                    <i t-attf-class="{{app.webIcon.iconClass}}"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="o_app_icon_placeholder" style="background-color: #714B67">
+                                    <t t-esc="app.name[0]"/>
+                                </div>
+                            </t>
+                            <span class="o_app_name" t-esc="app.name"/>
+                        </div>
+                    </DropdownItem>
+                </t>
+             </div>
+        </xpath>
+    </t>
+</templates>
+
