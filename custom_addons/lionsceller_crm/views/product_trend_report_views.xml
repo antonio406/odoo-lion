@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Tree View - Lista de Tendencias -->
+    <record id="view_product_trend_report_tree" model="ir.ui.view">
+        <field name="name">product.trend.report.tree</field>
+        <field name="model">product.trend.report</field>
+        <field name="arch" type="xml">
+            <list string="Tendencias de Productos" create="false" delete="false" edit="false">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="month"/>
+                <field name="qty_sold" sum="Total Vendido"/>
+                <field name="total_revenue" sum="Ingresos Totales" widget="monetary"/>
+                <field name="avg_price" widget="monetary"/>
+                <field name="order_count" sum="Total Órdenes"/>
+                <field name="user_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View - Análisis Multidimensional -->
+    <record id="view_product_trend_report_pivot" model="ir.ui.view">
+        <field name="name">product.trend.report.pivot</field>
+        <field name="model">product.trend.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Tendencias" sample="1">
+                <field name="categ_id" type="row"/>
+                <field name="month" type="col"/>
+                <field name="total_revenue" type="measure"/>
+                <field name="qty_sold" type="measure"/>
+                <field name="order_count" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View - Visualización de Tendencias -->
+    <record id="view_product_trend_report_graph" model="ir.ui.view">
+        <field name="name">product.trend.report.graph</field>
+        <field name="model">product.trend.report</field>
+        <field name="arch" type="xml">
+            <graph string="Gráfico de Tendencias" type="line" sample="1">
+                <field name="month" type="row"/>
+                <field name="total_revenue" type="measure"/>
+                <field name="qty_sold" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View - Filtros y Agrupaciones -->
+    <record id="view_product_trend_report_search" model="ir.ui.view">
+        <field name="name">product.trend.report.search</field>
+        <field name="model">product.trend.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Tendencias">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="user_id"/>
+                <field name="partner_id"/>
+                
+                <filter string="Este Mes" name="this_month" 
+                        domain="[('order_date','&gt;=',(context_today() - relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="Este Trimestre" name="this_quarter"
+                        domain="[('order_date','&gt;=', (context_today() - relativedelta(months=3)).strftime('%Y-%m-01'))]"/>
+                <filter string="Este Año" name="this_year"
+                        domain="[('order_date','&gt;=', datetime.datetime.now().strftime('%Y-01-01'))]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Producto" name="group_product" context="{'group_by':'product_id'}"/>
+                    <filter string="Categoría" name="group_category" context="{'group_by':'categ_id'}"/>
+                    <filter string="Mes" name="group_month" context="{'group_by':'month'}"/>
+                    <filter string="Trimestre" name="group_quarter" context="{'group_by':'quarter'}"/>
+                    <filter string="Año" name="group_year" context="{'group_by':'year'}"/>
+                    <filter string="Vendedor" name="group_salesperson" context="{'group_by':'user_id'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Dashboard/Kanban View - Vista de Resumen -->
+    <record id="view_product_trend_report_kanban" model="ir.ui.view">
+        <field name="name">product.trend.report.kanban</field>
+        <field name="model">product.trend.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false" edit="false">
+                <field name="product_id"/>
+                <field name="qty_sold"/>
+                <field name="total_revenue"/>
+                <field name="trend_status"/>
+                <field name="month"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="product_id"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="month"/>
+                                    </span>
+                                </div>
+                                <span>
+                                    <field name="trend_status" widget="badge"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>💰 Ingresos: <strong><field name="total_revenue" widget="monetary"/></strong></div>
+                                <div>📦 Vendidos: <strong><field name="qty_sold"/></strong></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action - Abrir Reporte -->
+    <record id="action_product_trend_report" model="ir.actions.act_window">
+        <field name="name">Análisis de Tendencias</field>
+        <field name="res_model">product.trend.report</field>
+        <field name="view_mode">graph,pivot,list,kanban</field>
+        <field name="search_view_id" ref="view_product_trend_report_search"/>
+        <field name="context">{
+            'search_default_this_quarter': 1,
+            'search_default_group_product': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                📊 Análisis de Tendencias de Productos
+            </p>
+            <p>
+                Este reporte calcula tendencias de ventas basadas en órdenes confirmadas.
+                <br/>
+                Agrupa ventas por producto, categoría, período y vendedor.
+                <br/><br/>
+                <b>Estados de Tendencia:</b>
+                <ul>
+                    <li>🔥 <b>Tendencia Alta:</b> +50% sobre promedio</li>
+                    <li>📈 <b>En Crecimiento:</b> +20% a +50%</li>
+                    <li>➡️ <b>Estable:</b> -10% a +20%</li>
+                    <li>📉 <b>En Declive:</b> -30% a -10%</li>
+                    <li>❄️ <b>Baja Demanda:</b> Menos de -30%</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_product_trend_report"
+              name="Tendencias de Productos"
+              parent="crm.crm_menu_report"
+              action="action_product_trend_report"
+              sequence="10"/>
+
+</odoo>

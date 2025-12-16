@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- CRM Configuration Settings View -->
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.lionsceller.crm</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//app[@name='crm']//block[1]" position="inside">
+                    <setting string="Creación Automática de Leads" 
+                             help="Al crear un contacto con un asesor asignado, se crea automáticamente un lead">
+                        <div class="text-muted">
+                            Cuando se registra un nuevo contacto/cliente y se le asigna un asesor de ventas,
+                            el sistema creará automáticamente un lead vinculado a ese contacto.
+                        </div>
+                    </setting>
+                </xpath>
+                
+                <!-- WhatsApp Configuration -->
+                <xpath expr="//app[@name='crm']" position="inside">
+                    <block title="WhatsApp Cloud API">
+                        <setting string="Modo de Prueba WhatsApp" 
+                                 help="Simula el envío sin enviar mensajes reales">
+                            <field name="whatsapp_test_mode"/>
+                            <div class="text-muted mt8">
+                                ✅ Activo: Los mensajes se simulan (no se envían)<br/>
+                                ❌ Desactivado: Los mensajes se envían realmente vía Meta Cloud API
+                            </div>
+                        </setting>
+                        
+                        <setting string="WhatsApp Access Token" 
+                                 help="Token de acceso de Meta Cloud API"
+                                 invisible="whatsapp_test_mode">
+                            <field name="whatsapp_access_token" 
+                                   password="True"
+                                   placeholder="EAAxxxxxxxxxxxxxxxxxxxxxxx"
+                                   invisible="0"/>
+                            <div class="text-muted mt8">
+                                Obtén tu token en: 
+                                <a href="https://developers.facebook.com/" target="_blank">
+                                    Meta for Developers
+                                </a>
+                            </div>
+                        </setting>
+                        
+                        <setting string="Phone Number ID" 
+                                 help="ID del número de WhatsApp Business"
+                                 invisible="whatsapp_test_mode">
+                            <field name="whatsapp_phone_number_id" 
+                                   placeholder="1234567890123456"
+                                   invisible="0"/>
+                            <div class="text-muted mt8">
+                                Webhook URL: 
+                                <code>https://tu-dominio.com/whatsapp/webhook</code>
+                            </div>
+                        </setting>
+                        
+                        <setting string="Webhook Verify Token" 
+                                 help="Token para verificar el webhook"
+                                 invisible="whatsapp_test_mode">
+                            <field name="whatsapp_verify_token" invisible="0"/>
+                            <div class="text-muted mt8">
+                                Usa este mismo token al configurar el webhook en Meta
+                            </div>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

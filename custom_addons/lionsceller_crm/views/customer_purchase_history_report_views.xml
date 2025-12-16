@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- List View -->
+    <record id="view_customer_purchase_history_report_list" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.list</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <list string="Historial de Compras" create="false" delete="false" edit="false">
+                <field name="partner_name" string="Cliente"/>
+                <field name="total_purchased" sum="Total Comprado" widget="monetary"/>
+                <field name="order_count" sum="Total Órdenes"/>
+                <field name="avg_order_value" widget="monetary" optional="hide"/>
+                <field name="product_count" optional="hide"/>
+                <field name="first_purchase_date" optional="hide"/>
+                <field name="last_purchase_date"/>
+                <field name="top_product_id" optional="hide"/>
+                <field name="user_id" optional="hide"/>
+                <field name="partner_city" optional="hide"/>
+                <field name="partner_email" optional="hide"/>
+                <field name="partner_phone" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_customer_purchase_history_report_form" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.form</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <form string="Detalle del Cliente" create="false" delete="false" edit="false">
+                <header>
+                    <button name="action_view_customer_orders" type="object" string="Ver Órdenes" class="btn-primary"/>
+                    <button name="action_view_customer_products" type="object" string="Ver Productos" class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="partner_name"/></h1>
+                    </div>
+                    <group>
+                        <group name="customer_info" string="Información del Cliente">
+                            <field name="partner_id"/>
+                            <field name="partner_email" widget="email"/>
+                            <field name="partner_phone" widget="phone"/>
+                            <field name="partner_city"/>
+                            <field name="user_id"/>
+                            <field name="team_id"/>
+                        </group>
+                        <group name="stats" string="Estadísticas Generales">
+                            <field name="total_purchased" widget="monetary"/>
+                            <field name="order_count"/>
+                            <field name="avg_order_value" widget="monetary"/>
+                            <field name="product_count"/>
+                            <field name="total_qty"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="timeline" string="Línea de Tiempo">
+                            <field name="first_purchase_date"/>
+                            <field name="last_purchase_date"/>
+                            <field name="purchase_frequency_days"/>
+                        </group>
+                        <group name="top_products" string="Producto Favorito">
+                            <field name="top_product_id"/>
+                            <field name="top_product_qty"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_customer_purchase_history_report_kanban" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.kanban</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false" edit="false">
+                <field name="partner_id"/>
+                <field name="partner_name"/>
+                <field name="total_purchased"/>
+                <field name="order_count"/>
+                <field name="last_purchase_date"/>
+                <field name="avg_order_value"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="partner_name"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="order_count"/> órdenes
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>💰 Total Comprado</strong><br/>
+                                        <field name="total_purchased" widget="monetary"/>
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>🎫 Ticket Promedio</strong><br/>
+                                        <field name="avg_order_value" widget="monetary"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <i class="fa fa-calendar"/> Última Compra: <field name="last_purchase_date"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_customer_purchase_history_report_pivot" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.pivot</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Clientes" sample="1">
+                <field name="partner_city" type="row"/>
+                <field name="total_purchased" type="measure"/>
+                <field name="order_count" type="measure"/>
+                <field name="avg_order_value" type="measure"/>
+                <field name="purchase_frequency_days" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_customer_purchase_history_report_graph" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.graph</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <graph string="Top Clientes" type="bar" sample="1">
+                <field name="partner_name" type="row"/>
+                <field name="total_purchased"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_customer_purchase_history_report_search" model="ir.ui.view">
+        <field name="name">customer.purchase.history.report.search</field>
+        <field name="model">customer.purchase.history.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Clientes">
+                <field name="partner_name" string="Cliente"
+                       filter_domain="['|', ('partner_name','ilike',self), ('partner_email','ilike',self)]"/>
+                <field name="partner_city"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                
+                <filter string="👑 VIP" name="vip" 
+                        domain="[('total_purchased','&gt;=', 1000000)]"/>
+                <filter string="⭐ Frecuentes" name="frequent" 
+                        domain="[('order_count','&gt;=', 10)]"/>
+                <filter string="🆕 Nuevos" name="new_customers" 
+                        domain="[('order_count','=', 1)]"/>
+                
+                <separator/>
+                <filter string="Compras &gt; $100,000" name="high_value" 
+                        domain="[('total_purchased','&gt;=', 100000)]"/>
+                <filter string="5+ Órdenes" name="multiple_orders" 
+                        domain="[('order_count','&gt;=', 5)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
+                    <filter string="Equipo" name="group_team" context="{'group_by':'team_id'}"/>
+                    <filter string="Ciudad" name="group_city" context="{'group_by':'partner_city'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_customer_purchase_history_report" model="ir.actions.act_window">
+        <field name="name">Historial de Compras de Clientes</field>
+        <field name="res_model">customer.purchase.history.report</field>
+        <field name="view_mode">list,kanban,graph,pivot,form</field>
+        <field name="search_view_id" ref="view_customer_purchase_history_report_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                📊 Historial de Compras de Clientes
+            </p>
+            <p>
+                Este reporte muestra el comportamiento de compra de cada cliente,
+                incluyendo montos totales, productos favoritos, frecuencia y más.
+                <br/><br/>
+                <b>Segmentos de Clientes:</b>
+                <ul>
+                    <li>👑 <b>VIP:</b> Compraron más de $1,000,000</li>
+                    <li>⭐ <b>Frecuente:</b> 10+ órdenes y compra activa (&lt;30 días)</li>
+                    <li>✅ <b>Regular:</b> 5+ órdenes y compra reciente (&lt;60 días)</li>
+                    <li>📅 <b>Ocasional:</b> Compras esporádicas</li>
+                    <li>💤 <b>Inactivo:</b> Sin compras por más de 6 meses</li>
+                    <li>🆕 <b>Nuevo:</b> Solo 1 orden en los últimos 30 días</li>
+                </ul>
+                <br/>
+                <b>Métricas Clave:</b>
+                <ul>
+                    <li><b>Total Comprado:</b> Suma de todas las órdenes confirmadas</li>
+                    <li><b>Ticket Promedio:</b> Valor promedio por orden</li>
+                    <li><b>Frecuencia de Compra:</b> Días promedio entre órdenes</li>
+                    <li><b>Producto Favorito:</b> Producto más comprado por cantidad</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_customer_purchase_history_report"
+              name="Historial de Compras"
+              parent="sale.menu_sale_report"
+              action="action_customer_purchase_history_report"
+              sequence="50"/>
+
+</odoo>

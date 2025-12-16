@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- List View -->
+    <record id="view_whatsapp_sales_trend_report_list" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.list</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <list string="Tendencia Ventas WhatsApp" create="false" delete="false" edit="false">
+                <field name="period_month"/>
+                <field name="user_id"/>
+                <field name="team_id" optional="hide"/>
+                <field name="total_leads" sum="Total Leads"/>
+                <field name="leads_won" sum="Total Ganados"/>
+                <field name="conversion_rate" widget="progressbar"/>
+                <field name="total_sales" sum="Total Vendido" widget="monetary"/>
+                <field name="avg_deal_value" widget="monetary" optional="hide"/>
+                <field name="avg_days_to_close" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_whatsapp_sales_trend_report_form" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.form</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <form string="Detalle de Tendencia" create="false" delete="false" edit="false">
+                <header>
+                    <button name="action_view_leads" type="object" string="Ver Leads WhatsApp" class="btn-primary"/>
+
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="user_id"/></h1>
+                        <h2><field name="period_month"/> - <field name="team_id"/></h2>
+                    </div>
+                    <group>
+                        <group name="leads_stats" string="Estadísticas de Leads">
+                            <field name="total_leads"/>
+                            <field name="leads_won"/>
+                            <field name="leads_lost"/>
+                            <field name="leads_active"/>
+                            <field name="conversion_rate" widget="percentpie"/>
+                            <field name="win_rate" widget="percentpie"/>
+                        </group>
+                        <group name="sales_stats" string="Estadísticas de Ventas">
+                            <field name="total_sales" widget="monetary"/>
+                            <field name="order_count"/>
+                            <field name="avg_deal_value" widget="monetary"/>
+                            <field name="avg_days_to_close"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_whatsapp_sales_trend_report_kanban" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.kanban</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false" edit="false">
+                <field name="user_id"/>
+                <field name="period_month"/>
+                <field name="total_leads"/>
+                <field name="leads_won"/>
+                <field name="conversion_rate"/>
+                <field name="total_sales"/>
+
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="user_id"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="period_month"/> - <field name="total_leads"/> leads WhatsApp
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>✅ Ganados</strong><br/>
+                                        <t t-esc="record.leads_won.raw_value"/> (<t t-esc="Math.round(record.conversion_rate.raw_value)"/>%)
+                                    </div>
+                                    <div class="col-6">
+                                        <strong>💰 Ventas</strong><br/>
+                                        <field name="total_sales" widget="monetary"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_whatsapp_sales_trend_report_pivot" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.pivot</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis WhatsApp">
+                <field name="user_id" type="row"/>
+                <field name="period_month" type="col"/>
+                <field name="total_leads" type="measure"/>
+                <field name="leads_won" type="measure"/>
+                <field name="total_sales" type="measure"/>
+                <field name="conversion_rate" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_whatsapp_sales_trend_report_graph" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.graph</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <graph string="Tendencia WhatsApp" type="line">
+                <field name="period_month" type="row"/>
+                <field name="total_leads"/>
+                <field name="leads_won"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_whatsapp_sales_trend_report_search" model="ir.ui.view">
+        <field name="name">whatsapp.sales.trend.report.search</field>
+        <field name="model">whatsapp.sales.trend.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Tendencias">
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="period_month"/>
+                
+                <filter string="Este Mes" name="this_month" 
+                        domain="[('period_month','=', context_today().strftime('%Y-%m'))]"/>
+                <filter string="Mes Anterior" name="last_month" 
+                        domain="[('period_month','=', (context_today() - relativedelta(months=1)).strftime('%Y-%m'))]"/>
+                <filter string="Este Trimestre" name="this_quarter" 
+                        domain="[('period_quarter','=', 'Q' + str((context_today().month-1)//3 + 1) + ' ' + str(context_today().year))]"/>
+                <filter string="Este Año" name="this_year" 
+                        domain="[('period_year','=', context_today().strftime('%Y'))]"/>
+                
+                <separator/>
+                <filter string="🌟 Excelente" name="excellent" 
+                        domain="[('total_leads','&gt;=', 10)]"/>
+                <filter string="✅ Buena Conversión" name="good_conversion" 
+                        domain="[('leads_won','&gt;=', 5)]"/>
+                <filter string="💰 Altas Ventas" name="high_sales" 
+                        domain="[('total_sales','&gt;=', 100000)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Asesor" name="group_user" context="{'group_by':'user_id'}"/>
+                    <filter string="Equipo" name="group_team" context="{'group_by':'team_id'}"/>
+                    <filter string="Mes" name="group_month" context="{'group_by':'period_month'}"/>
+                    <filter string="Trimestre" name="group_quarter" context="{'group_by':'period_quarter'}"/>
+                    <filter string="Año" name="group_year" context="{'group_by':'period_year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_whatsapp_sales_trend_report" model="ir.actions.act_window">
+        <field name="name">Tendencia Ventas WhatsApp</field>
+        <field name="res_model">whatsapp.sales.trend.report</field>
+        <field name="view_mode">list,graph,kanban,pivot,form</field>
+        <field name="search_view_id" ref="view_whatsapp_sales_trend_report_search"/>
+        <field name="context">{
+            'search_default_this_month': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                📱 Tendencia de Ventas - Leads por WhatsApp
+            </p>
+            <p>
+                Este reporte analiza el desempeño de los asesores de venta
+                específicamente para leads que entraron por WhatsApp.
+                <br/><br/>
+                <b>Métricas Clave:</b>
+                <ul>
+                    <li><b>Total Leads WhatsApp:</b> Leads que mencionan WhatsApp</li>
+                    <li><b>% Conversión:</b> Leads ganados vs total de leads</li>
+                    <li><b>% Efectividad:</b> Leads ganados vs leads cerrados</li>
+                    <li><b>Ventas Generadas:</b> Ingresos de leads WhatsApp</li>
+                    <li><b>Días Promedio Cierre:</b> Tiempo de conversión</li>
+                </ul>
+                <br/>
+                <b>Score de Desempeño:</b>
+                <ul>
+                    <li>🌟 <b>Excelente:</b> 75+ puntos</li>
+                    <li>✅ <b>Bueno:</b> 60-74 puntos</li>
+                    <li>📊 <b>Promedio:</b> 40-59 puntos</li>
+                    <li>⚠️ <b>Bajo:</b> Menos de 40 puntos</li>
+                </ul>
+                <br/>
+                <i>Fórmula: 40% conversión + 30% ventas + 30% velocidad</i>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_whatsapp_sales_trend_report"
+              name="Tendencia WhatsApp"
+              parent="crm.crm_menu_report"
+              action="action_whatsapp_sales_trend_report"
+              sequence="15"/>
+
+</odoo>

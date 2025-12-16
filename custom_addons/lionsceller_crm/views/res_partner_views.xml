@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_lionsceller" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.lionsceller</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Modificar etiqueta del campo user_id para llamarlo "Asesor de Ventas" -->
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="attributes">
+                <attribute name="string">Asesor de Ventas</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

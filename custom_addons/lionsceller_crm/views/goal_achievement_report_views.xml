@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- List View -->
+    <record id="view_goal_achievement_report_list" model="ir.ui.view">
+        <field name="name">goal.achievement.report.list</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <list string="Cumplimiento de Metas" create="false" delete="false" edit="false"
+                  decoration-success="achievement_status == 'exceeded'"
+                  decoration-info="achievement_status == 'achieved'"
+                  decoration-warning="achievement_status in ('in_progress', 'at_risk')"
+                  decoration-danger="achievement_status == 'not_achieved'">
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="period_month"/>
+                <field name="total_sales" sum="Total Vendido" widget="monetary"/>
+                <field name="sales_goal" sum="Meta Total" widget="monetary"/>
+                <field name="achievement_percentage" widget="progressbar"/>
+                <field name="achievement_status" widget="badge"/>
+                <field name="remaining_amount" widget="monetary" optional="hide"/>
+                <field name="order_count" sum="Total Órdenes"/>
+                <field name="won_opportunities" sum="Total Ganadas"/>
+                <field name="days_remaining" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_goal_achievement_report_form" model="ir.ui.view">
+        <field name="name">goal.achievement.report.form</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <form string="Detalle de Cumplimiento" create="false" delete="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="achievement_status" widget="badge"/>
+                    </div>
+                    <group>
+                        <group name="salesperson" string="Vendedor">
+                            <field name="user_id"/>
+                            <field name="team_id"/>
+                            <field name="period_month"/>
+                            <field name="period_year"/>
+                        </group>
+                        <group name="performance" string="Desempeño">
+                            <field name="achievement_percentage" widget="percentpie"/>
+                            <field name="days_remaining"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="sales" string="Ventas">
+                            <field name="total_sales" widget="monetary"/>
+                            <field name="order_count"/>
+                            <field name="won_opportunities"/>
+                        </group>
+                        <group name="goals" string="Metas">
+                            <field name="sales_goal" widget="monetary"/>
+                            <field name="opportunity_goal"/>
+                            <field name="remaining_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_goal_achievement_report_pivot" model="ir.ui.view">
+        <field name="name">goal.achievement.report.pivot</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Cumplimiento">
+                <field name="user_id" type="row"/>
+                <field name="period_month" type="col"/>
+                <field name="total_sales" type="measure"/>
+                <field name="sales_goal" type="measure"/>
+                <field name="achievement_percentage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_goal_achievement_report_graph" model="ir.ui.view">
+        <field name="name">goal.achievement.report.graph</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <graph string="Cumplimiento de Metas" type="bar" stacked="0">
+                <field name="user_id" type="row"/>
+                <field name="total_sales"/>
+                <field name="sales_goal"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_goal_achievement_report_kanban" model="ir.ui.view">
+        <field name="name">goal.achievement.report.kanban</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false" edit="false">
+                <field name="user_id"/>
+                <field name="total_sales"/>
+                <field name="sales_goal"/>
+                <field name="achievement_percentage"/>
+                <field name="achievement_status"/>
+                <field name="period_month"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="user_id"/>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="period_month"/> - <field name="team_id"/>
+                                    </span>
+                                </div>
+                                <span>
+                                    <field name="achievement_status" widget="badge"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div class="progress" style="height: 20px; margin: 10px 0;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         t-attf-style="width: #{record.achievement_percentage.raw_value}%"
+                                         t-attf-class="progress-bar #{record.achievement_percentage.raw_value >= 100 ? 'bg-success' : record.achievement_percentage.raw_value >= 80 ? 'bg-info' : record.achievement_percentage.raw_value >= 50 ? 'bg-warning' : 'bg-danger'}">
+                                        <strong><t t-esc="Math.round(record.achievement_percentage.raw_value)"/>%</strong>
+                                    </div>
+                                </div>
+                                <div>💰 Ventas: <strong><field name="total_sales" widget="monetary"/></strong></div>
+                                <div>🎯 Meta: <field name="sales_goal" widget="monetary"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_goal_achievement_report_search" model="ir.ui.view">
+        <field name="name">goal.achievement.report.search</field>
+        <field name="model">goal.achievement.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Cumplimiento">
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="period_month"/>
+                
+                <filter string="Este Mes" name="this_month" 
+                        domain="[('period_month','=', context_today().strftime('%Y-%m'))]"/>
+                <filter string="Mes Anterior" name="last_month" 
+                        domain="[('period_month','=', (context_today() - relativedelta(months=1)).strftime('%Y-%m'))]"/>
+                <filter string="Este Año" name="this_year" 
+                        domain="[('period_year','=', context_today().strftime('%Y'))]"/>
+                
+                <separator/>
+                <filter string="🏆 Superado" name="exceeded" 
+                        domain="[('total_sales','&gt;=', 1.1)]"/>
+                <filter string="✅ Alcanzado" name="achieved" 
+                        domain="[('total_sales','&gt;=', 1.0)]"/>
+                <filter string="⚠️ En Riesgo" name="at_risk" 
+                        domain="[('total_sales','&lt;', 0.8)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
+                    <filter string="Equipo" name="group_team" context="{'group_by':'team_id'}"/>
+                    <filter string="Mes" name="group_month" context="{'group_by':'period_month'}"/>
+                    <filter string="Año" name="group_year" context="{'group_by':'period_year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_goal_achievement_report" model="ir.actions.act_window">
+        <field name="name">Cumplimiento de Metas</field>
+        <field name="res_model">goal.achievement.report</field>
+        <field name="view_mode">kanban,graph,list,pivot,form</field>
+        <field name="search_view_id" ref="view_goal_achievement_report_search"/>
+        <field name="context">{
+            'search_default_this_month': 1,
+            'search_default_group_user': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                📊 Reporte de Cumplimiento de Metas
+            </p>
+            <p>
+                Este reporte muestra el desempeño de los vendedores comparando 
+                las ventas realizadas contra las metas establecidas.
+                <br/><br/>
+                <b>Indicadores:</b>
+                <ul>
+                    <li>🏆 <b>Superado:</b> Más del 110% de la meta</li>
+                    <li>✅ <b>Alcanzado:</b> 100% - 110% de la meta</li>
+                    <li>📊 <b>En Progreso:</b> 80% - 100% de la meta</li>
+                    <li>⚠️ <b>En Riesgo:</b> 50% - 80% de la meta</li>
+                    <li>❌ <b>No Alcanzado:</b> Menos del 50%</li>
+                </ul>
+                <br/>
+                <b>Nota:</b> Las metas por defecto son $500,000 por mes y 5 oportunidades ganadas.
+                Estas pueden ser configuradas por equipo o vendedor.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_goal_achievement_report"
+              name="Cumplimiento de Metas"
+              parent="crm.crm_menu_report"
+              action="action_goal_achievement_report"
+              sequence="5"/>
+
+</odoo>

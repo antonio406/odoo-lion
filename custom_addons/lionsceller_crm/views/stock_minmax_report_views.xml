@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- List View -->
+    <record id="view_stock_minmax_report_list" model="ir.ui.view">
+        <field name="name">stock.minmax.report.list</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <list string="Inventarios Mínimos y Máximos" create="false" delete="false" edit="false"
+                  decoration-danger="stock_status in ('critical', 'stockout')"
+                  decoration-warning="stock_status in ('low', 'reorder')"
+                  decoration-info="stock_status == 'overstock'"
+                  decoration-success="stock_status == 'optimal'">
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                <field name="qty_available" decoration-bf="1"/>
+                <field name="avg_daily_consumption"/>
+                <field name="days_of_stock" widget="float" optional="hide"/>
+                <field name="min_stock"/>
+                <field name="reorder_point"/>
+                <field name="max_stock"/>
+                <field name="stock_status" widget="badge"/>
+                <field name="qty_to_order" decoration-bf="1"/>
+                <field name="stock_value" widget="monetary" sum="Valor Total"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_stock_minmax_report_form" model="ir.ui.view">
+        <field name="name">stock.minmax.report.form</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <form string="Detalle de Inventario" create="false" delete="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="stock_status" widget="badge"/>
+                    </div>
+                    <group>
+                        <group name="product_info" string="Información del Producto">
+                            <field name="product_id"/>
+                            <field name="default_code"/>
+                            <field name="categ_id"/>
+                            <field name="standard_price" widget="monetary"/>
+                        </group>
+                        <group name="stock_levels" string="Niveles de Stock">
+                            <field name="qty_available" decoration-bf="1"/>
+                            <field name="virtual_available"/>
+                            <field name="stock_value" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group name="consumption" string="Consumo y Rotación">
+                            <field name="avg_daily_consumption"/>
+                            <field name="total_consumption_90d"/>
+                            <field name="days_of_stock"/>
+                        </group>
+                        <group name="calculated" string="Inventarios Calculados">
+                            <field name="min_stock"/>
+                            <field name="reorder_point"/>
+                            <field name="max_stock"/>
+                        </group>
+                    </group>
+                    <group name="recommendations" string="Recomendaciones">
+                        <field name="qty_to_order" decoration-bf="1"/>
+                        <label for="qty_to_order" string="💡 Se recomienda ordenar esta cantidad para alcanzar el stock máximo"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_stock_minmax_report_pivot" model="ir.ui.view">
+        <field name="name">stock.minmax.report.pivot</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Inventario">
+                <field name="categ_id" type="row"/>
+                <field name="stock_status" type="col"/>
+                <field name="qty_available" type="measure"/>
+                <field name="stock_value" type="measure"/>
+                <field name="qty_to_order" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_stock_minmax_report_graph" model="ir.ui.view">
+        <field name="name">stock.minmax.report.graph</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <graph string="Gráfico de Inventarios" type="bar">
+                <field name="product_id" type="row"/>
+                <field name="qty_available"/>
+                <field name="min_stock"/>
+                <field name="max_stock"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_stock_minmax_report_kanban" model="ir.ui.view">
+        <field name="name">stock.minmax.report.kanban</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false" edit="false">
+                <field name="product_id"/>
+                <field name="qty_available"/>
+                <field name="min_stock"/>
+                <field name="max_stock"/>
+                <field name="stock_status"/>
+                <field name="qty_to_order"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="product_id"/>
+                                    </strong>
+                                </div>
+                                <span>
+                                    <field name="stock_status" widget="badge"/>
+                                </span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>📦 Stock: <strong><field name="qty_available"/></strong></div>
+                                <div>🔽 Mínimo: <field name="min_stock"/></div>
+                                <div>🔼 Máximo: <field name="max_stock"/></div>
+                                <div t-if="record.qty_to_order.raw_value > 0">
+                                    <strong>🛒 Ordenar: <field name="qty_to_order"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_stock_minmax_report_search" model="ir.ui.view">
+        <field name="name">stock.minmax.report.search</field>
+        <field name="model">stock.minmax.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Inventarios">
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                
+                <filter string="Con Stock" name="in_stock" 
+                        domain="[('qty_available','&gt;', 0)]"/>
+                <filter string="Sin Stock" name="no_stock" 
+                        domain="[('qty_available','&lt;=', 0)]"/>
+                <filter string="Bajo Consumo (90 días)" name="has_consumption" 
+                        domain="[('total_consumption_90d','&gt;', 0)]"/>
+                
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Categoría" name="group_category" context="{'group_by':'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_stock_minmax_report" model="ir.actions.act_window">
+        <field name="name">Inventarios Mínimos y Máximos</field>
+        <field name="res_model">stock.minmax.report</field>
+        <field name="view_mode">list,form,kanban,pivot,graph</field>
+        <field name="search_view_id" ref="view_stock_minmax_report_search"/>
+        <field name="context">{
+            'search_default_has_consumption': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                📊 Reporte de Inventarios Mínimos y Máximos
+            </p>
+            <p>
+                Este reporte calcula automáticamente los niveles óptimos de inventario 
+                basándose en el consumo histórico de los últimos 90 días.
+                <br/><br/>
+                <b>Niveles Calculados:</b>
+                <ul>
+                    <li><b>Stock Mínimo:</b> Inventario de seguridad para evitar rupturas</li>
+                    <li><b>Punto de Reorden:</b> Nivel en el que se debe ordenar más producto</li>
+                    <li><b>Stock Máximo:</b> Nivel óptimo para evitar sobrestock</li>
+                </ul>
+                <br/>
+                <b>Estados de Alerta:</b>
+                <ul>
+                    <li>🚨 <b>Crítico:</b> Por debajo del mínimo - Ordenar urgente</li>
+                    <li>🔴 <b>Stock Bajo:</b> Acercándose al mínimo</li>
+                    <li>⚠️ <b>Punto de Reorden:</b> Momento de ordenar</li>
+                    <li>✅ <b>Óptimo:</b> Stock en niveles ideales</li>
+                    <li>📦 <b>Sobrestock:</b> Inventario excesivo</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem id="menu_stock_minmax_report"
+              name="Inventarios Mín/Máx"
+              parent="stock.menu_warehouse_report"
+              action="action_stock_minmax_report"
+              sequence="10"/>
+
+</odoo>
